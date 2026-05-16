@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tasty Bite Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--o:#FF6B2B;--od:#e05520;--ol:#fff3ee;--g:#22c55e;--r:#ef4444;--y:#f59e0b;--bg:#f8f4f0;--card:#fff;--t:#1a1a1a;--mu:#888;--br:#ede8e3;--sh:0 2px 12px rgba(255,107,43,.1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;max-width:430px;margin:0 auto;}
+
+/* SETUP */
+#setup{position:fixed;inset:0;background:var(--o);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 20px 40px;overflow-y:auto;}
+.slogo{font-size:48px;margin:18px 0 6px;}
+#setup h1{font-family:'Baloo 2',cursive;font-size:30px;color:#fff;font-weight:800;}
+#setup .tag{color:rgba(255,255,255,.85);font-size:12px;margin-bottom:20px;}
+.scard{background:#fff;border-radius:20px;padding:20px;width:100%;max-width:400px;}
+.scard h2{font-family:'Baloo 2',cursive;font-size:17px;color:var(--o);margin-bottom:10px;}
+.shint{font-size:11px;color:var(--mu);margin-bottom:9px;line-height:1.65;}
+.sinput{width:100%;padding:11px 13px;border:1.5px solid var(--br);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;margin-bottom:9px;outline:none;transition:border .2s;}
+.sinput:focus{border-color:var(--o);}
+.errbox{background:#fee2e2;color:#b91c1c;border-radius:10px;padding:10px 13px;font-size:12px;margin-bottom:9px;line-height:1.6;display:none;}
+.sqlbox{background:#1e1e2e;color:#a6e3a1;border-radius:10px;padding:10px;font-size:10px;font-family:monospace;width:100%;height:170px;border:none;margin-top:6px;resize:none;display:none;}
+.sdiv{border:none;border-top:1px solid var(--br);margin:11px 0;}
+.slnk{background:none;border:none;color:var(--o);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
+#app{display:none;}
+
+/* TOPBAR */
+.topbar{background:var(--o);color:#fff;padding:12px 15px 10px;display:flex;align-items:center;gap:9px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(255,107,43,.25);}
+.topbar h1{font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;}
+.topbar small{font-size:10px;opacity:.85;display:block;margin-top:-2px;}
+.dot{width:9px;height:9px;border-radius:50%;background:#fff;margin-left:auto;opacity:.4;transition:all .3s;flex-shrink:0;}
+.dot.sy{opacity:1;animation:pu 1s infinite;}
+.dot.ok{background:#4ade80;opacity:1;}
+.dot.er{background:#f87171;opacity:1;}
+@keyframes pu{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+
+/* NAV */
+.nav{display:flex;background:#fff;border-bottom:2px solid var(--br);overflow-x:auto;scrollbar-width:none;position:sticky;top:62px;z-index:99;}
+.nav::-webkit-scrollbar{display:none;}
+.nb{flex:0 0 auto;padding:8px 12px;font-size:11px;font-weight:700;color:var(--mu);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;font-family:'Nunito',sans-serif;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s;}
+.nb .ni{font-size:16px;}
+.nb.ac{color:var(--o);border-bottom-color:var(--o);}
+
+/* SECTIONS */
+.sec{display:none;padding:12px;animation:fi .3s;}
+.sec.ac{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* CARD */
+.card{background:var(--card);border-radius:15px;padding:14px;margin-bottom:11px;box-shadow:var(--sh);border:1px solid var(--br);}
+.ctit{font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;color:var(--o);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+/* FORM */
+.fg{margin-bottom:10px;}
+.fg label{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px;}
+.fi{width:100%;padding:9px 12px;border:1.5px solid var(--br);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t);outline:none;transition:border .2s;}
+.fi:focus{border-color:var(--o);background:#fff;}
+.rg{display:flex;gap:7px;}
+.rl{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:7px 11px;border:1.5px solid var(--br);border-radius:10px;cursor:pointer;flex:1;justify-content:center;transition:all .2s;}
+.rl input{display:none;}
+.rl.sel{border-color:var(--o);background:var(--ol);color:var(--o);}
+
+/* BUTTONS */
+.btn{padding:9px 16px;border:none;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .18s;display:inline-flex;align-items:center;gap:6px;}
+.bp{background:var(--o);color:#fff;}
+.bs{background:var(--g);color:#fff;}
+.bd{background:var(--r);color:#fff;}
+.bg{background:var(--bg);color:var(--t);border:1.5px solid var(--br);}
+.sm{padding:5px 10px;font-size:11px;border-radius:8px;}
+.fw{width:100%;justify-content:center;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* CUSTOMER CARD */
+.cc{background:var(--card);border-radius:15px;padding:12px;margin-bottom:9px;box-shadow:var(--sh);border:1px solid var(--br);}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.cn{font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;}
+.cb{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.bv{background:#dcfce7;color:#16a34a;}
+.bn{background:#fee2e2;color:#dc2626;}
+.be{background:#dbeafe;color:#1d4ed8;}
+.bu{background:#fef9c3;color:#854d0e;}
+.ci{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:2px;}
+.ca{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.db{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.dp{background:#dcfce7;color:#16a34a;}
+.du{background:#fee2e2;color:#dc2626;}
+
+/* ATT TABLE */
+.at{width:100%;border-collapse:collapse;font-size:11px;}
+.at th{background:var(--o);color:#fff;padding:6px 3px;text-align:center;font-size:10px;}
+.at td{padding:5px 3px;text-align:center;border-bottom:1px solid var(--br);}
+.at tr:nth-child(even) td{background:var(--bg);}
+.ab{width:28px;height:28px;border-radius:7px;border:none;cursor:pointer;font-size:12px;}
+.ap{background:#dcfce7;color:#16a34a;}
+.aa{background:#fee2e2;color:#dc2626;}
+
+/* BILLING */
+.mi{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--br);}
+.mi:last-child{border-bottom:none;}
+.mn{font-size:13px;font-weight:600;}
+.mp{font-size:11px;color:var(--mu);}
+.qc{display:flex;align-items:center;gap:8px;}
+.qb{width:27px;height:27px;border-radius:7px;border:none;background:var(--o);color:#fff;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.qv{font-size:14px;font-weight:700;min-width:20px;text-align:center;}
+.btot{background:var(--o);color:#fff;border-radius:13px;padding:12px 15px;margin-top:11px;}
+.br2{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;}
+.grand{font-family:'Baloo 2',cursive;font-size:18px;font-weight:800;}
+
+/* STATS */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.sc{background:var(--card);border-radius:13px;padding:12px;box-shadow:var(--sh);text-align:center;border:1px solid var(--br);}
+.sv{font-family:'Baloo 2',cursive;font-size:23px;font-weight:800;color:var(--o);}
+.sl{font-size:10px;color:var(--mu);font-weight:700;text-transform:uppercase;}
+
+.tgc{background:linear-gradient(135deg,#0088cc,#005fa3);color:#fff;border-radius:15px;padding:14px;margin-bottom:11px;}
+.tgc h3{font-family:'Baloo 2',cursive;font-size:14px;font-weight:700;margin-bottom:6px;}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;}
+.mo.op{display:flex;}
+.md{background:#fff;border-radius:22px 22px 0 0;padding:17px 15px 28px;width:100%;max-height:90vh;overflow-y:auto;animation:su .3s;}
+@keyframes su{from{transform:translateY(100%)}to{transform:none}}
+.mh{width:36px;height:4px;background:var(--br);border-radius:4px;margin:0 auto 13px;}
+.mt2{font-family:'Baloo 2',cursive;font-size:17px;font-weight:800;color:var(--o);margin-bottom:12px;}
+
+/* TOAST */
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:9px 18px;border-radius:30px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
+.toast.sh{opacity:1;}
+
+/* MISC */
+.sb2{display:flex;align-items:center;background:#fff;border:1.5px solid var(--br);border-radius:11px;padding:7px 11px;gap:7px;margin-bottom:11px;}
+.sb2 input{border:none;background:none;outline:none;font-size:13px;flex:1;font-family:'Nunito',sans-serif;}
+.tbtns{display:flex;background:var(--bg);border-radius:11px;padding:3px;margin-bottom:12px;gap:3px;}
+.tbt{flex:1;padding:7px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;color:var(--mu);}
+.tbt.ac{background:#fff;color:var(--o);box-shadow:0 1px 5px rgba(0,0,0,.1);}
+.bhi{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--br);}
+.bhi:last-child{border-bottom:none;}
+.ld{text-align:center;padding:28px;color:var(--mu);font-size:13px;}
+.monnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.dbst{display:flex;align-items:center;gap:7px;font-size:12px;padding:9px 13px;border-radius:10px;margin-bottom:11px;font-weight:600;}
+.dbok{background:#dcfce7;color:#16a34a;}
+.dber{background:#fee2e2;color:#dc2626;}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup">
+  <div class="slogo">🍱</div>
+  <h1>Tasty Bite</h1>
+  <p class="tag">Home Delivery Tiffin — Admin Panel</p>
+
+  <div class="scard">
+    <h2>🔗 Connect Supabase Database</h2>
+    <div class="shint">Get both values from: <b>supabase.com → Your Project → Settings → API</b></div>
+
+    <input class="sinput" type="text" id="sb-url"
+      placeholder="Project URL  (https://xxxx.supabase.co)"
+      autocomplete="off" autocorrect="off" spellcheck="false">
+
+    <input class="sinput" type="text" id="sb-key"
+      placeholder="Anon Public Key  (eyJhbG...)"
+      autocomplete="off" autocorrect="off" spellcheck="false">
+
+    <div class="errbox" id="errbox"></div>
+
+    <div id="sql-warn" style="display:none;">
+      <div class="shint" style="color:#b45309;font-weight:700;margin-top:4px;">
+        ⚠️ Tables not found! Copy the SQL below → open Supabase → SQL Editor → paste → Run. Then click Connect again.
+      </div>
+    </div>
+    <textarea class="sqlbox" id="sqlbox" readonly>CREATE TABLE IF NOT EXISTS customers (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name text NOT NULL, mobile text NOT NULL, address text,
+  occupation text DEFAULT 'employed', food_type text DEFAULT 'veg',
+  amount numeric DEFAULT 0, start_date date, due_date date,
+  due_status text DEFAULT 'unpaid', paid_at timestamptz,
+  last_reminder timestamptz, created_at timestamptz DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS attendance (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  customer_id uuid REFERENCES customers(id) ON DELETE CASCADE,
+  att_date date NOT NULL, lunch integer DEFAULT 1, dinner integer DEFAULT 1,
+  UNIQUE(customer_id, att_date)
+);
+CREATE TABLE IF NOT EXISTS bills (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  bill_date date NOT NULL, bill_time text,
+  items jsonb NOT NULL, total numeric NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS settings (key text PRIMARY KEY, value text);
+ALTER TABLE customers  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bills      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE settings   ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "open_c" ON customers  FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "open_a" ON attendance FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "open_b" ON bills      FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "open_s" ON settings   FOR ALL USING (true) WITH CHECK (true);</textarea>
+
+    <button class="btn bp fw" id="con-btn" onclick="connectDB()" style="width:100%;justify-content:center;margin-top:10px;">
+      🔌 Connect Database
+    </button>
+
+    <hr class="sdiv">
+    <div class="shint" style="margin:0;">
+      Previously connected on this device?
+      <button class="slnk" onclick="loadSaved()">Load saved credentials</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="topbar">
+    <div style="font-size:24px;">🍱</div>
+    <div><h1>Tasty Bite</h1><small>Tiffin Admin</small></div>
+    <div class="dot" id="dot"></div>
+  </div>
+
+  <nav class="nav">
+    <button class="nb ac" onclick="goTo('dashboard')" id="nav-dashboard"><span class="ni">📊</span>Dashboard</button>
+    <button class="nb" onclick="goTo('customers')" id="nav-customers"><span class="ni">👥</span>Customers</button>
+    <button class="nb" onclick="goTo('attendance')" id="nav-attendance"><span class="ni">📅</span>Attendance</button>
+    <button class="nb" onclick="goTo('billing')" id="nav-billing"><span class="ni">🧾</span>Billing</button>
+    <button class="nb" onclick="goTo('dues')" id="nav-dues"><span class="ni">💰</span>Dues</button>
+    <button class="nb" onclick="goTo('settings')" id="nav-settings"><span class="ni">⚙️</span>Settings</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div class="sec ac" id="sec-dashboard">
+    <div class="sg" id="stat-grid"><div class="ld" style="grid-column:span 2">Loading...</div></div>
+    <div class="card"><div class="ctit">📋 Today</div><div id="today-sum" class="ld">...</div></div>
+    <div class="card"><div class="ctit">⚠️ Unpaid Dues</div><div id="dues-alert">...</div></div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="sec" id="sec-customers">
+    <div class="sb2"><span>🔍</span><input type="text" placeholder="Search name or mobile..." id="csearch" oninput="renderCusts()"></div>
+    <button class="btn bp fw" onclick="openAdd()" style="margin-bottom:11px;">➕ Add New Customer</button>
+    <div id="cust-list"><div class="ld">Loading...</div></div>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div class="sec" id="sec-attendance">
+    <div class="card">
+      <div class="monnav">
+        <button class="btn bg sm" onclick="chMon(-1)">◀</button>
+        <span id="mon-lbl" style="font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;"></span>
+        <button class="btn bg sm" onclick="chMon(1)">▶</button>
+      </div>
+      <div class="fg">
+        <label>Customer</label>
+        <select class="fi" id="att-sel" onchange="renderAtt()"><option value="">-- Choose Customer --</option></select>
+      </div>
+    </div>
+    <div id="att-wrap"></div>
+    <div id="att-sum"></div>
+  </div>
+
+  <!-- BILLING -->
+  <div class="sec" id="sec-billing">
+    <div class="tbtns">
+      <button class="tbt ac" onclick="billTab('new')" id="bt-new">New Bill</button>
+      <button class="tbt" onclick="billTab('hist')" id="bt-hist">History</button>
+    </div>
+    <div id="bnew">
+      <div class="card"><div class="ctit">🍽️ Main Items</div><div id="main-items"></div></div>
+      <div class="card"><div class="ctit">➕ Add-ons</div><div id="addon-items"></div></div>
+      <div class="btot">
+        <div class="br2"><span>Items:</span><span id="b-cnt">0</span></div>
+        <div class="br2 grand"><span>Total:</span><span id="b-tot">₹0</span></div>
+      </div>
+      <div style="display:flex;gap:9px;margin-top:10px;">
+        <button class="btn bg" style="flex:1" onclick="clearBill()">🔄 Clear</button>
+        <button class="btn bp" style="flex:1" onclick="saveBill()">💾 Save Bill</button>
+      </div>
+    </div>
+    <div id="bhist" style="display:none;"><div id="hist-list" class="ld">Loading...</div></div>
+  </div>
+
+  <!-- DUES -->
+  <div class="sec" id="sec-dues">
+    <div class="tgc">
+      <h3>📱 Telegram Notifications</h3>
+      <p style="font-size:11px;opacity:.85;margin-bottom:8px;">Send payment reminders to your group.</p>
+      <button class="btn sm" onclick="sendAll()" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);">📤 Send All Reminders</button>
+    </div>
+    <div id="dues-list"><div class="ld">Loading...</div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="sec" id="sec-settings">
+    <div class="card">
+      <div class="ctit">🗄️ Database Status</div>
+      <div class="dbst" id="db-st">Checking...</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn bg sm" onclick="pingDB()">🔍 Test</button>
+        <button class="btn bd sm" onclick="disconn()">🔌 Disconnect</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctit">📱 Telegram</div>
+      <div class="fg"><label>Bot Token</label><input class="fi" type="text" id="tg-tok" placeholder="Bot token..."></div>
+      <div class="fg"><label>Chat / Group ID</label><input class="fi" type="text" id="tg-cid" placeholder="-100xxxxxxx"></div>
+      <button class="btn bp fw" onclick="saveTG()">💾 Save</button>
+    </div>
+    <div class="card" style="background:var(--ol);border-color:var(--o);">
+      <div class="ctit">ℹ️ Quick Guide</div>
+      <ul style="font-size:12px;line-height:1.9;padding-left:16px;">
+        <li>All data stored in Supabase PostgreSQL cloud</li>
+        <li>Same URL+Key = access from any device</li>
+        <li>2 absent sessions = 1 absent day</li>
+        <li>Absent days auto-extend due date</li>
+        <li>Unpaid 7+ days → auto Telegram reminder</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT CUSTOMER MODAL -->
+<div class="mo" id="mo-cust">
+  <div class="md">
+    <div class="mh"></div>
+    <div class="mt2" id="mo-title">➕ Add Customer</div>
+    <input type="hidden" id="edit-id">
+    <div class="fg"><label>Full Name *</label><input class="fi" type="text" id="c-name" placeholder="Customer name"></div>
+    <div class="fg"><label>Mobile *</label><input class="fi" type="tel" id="c-mob" placeholder="10-digit mobile"></div>
+    <div class="fg"><label>Occupation</label>
+      <div class="rg" id="occ-rg">
+        <label class="rl" onclick="selR('occ-rg',this)"><input type="radio" name="occ" value="employed"> 💼 Employed</label>
+        <label class="rl" onclick="selR('occ-rg',this)"><input type="radio" name="occ" value="student"> 📚 Student</label>
+      </div>
+    </div>
+    <div class="fg"><label>Food Type</label>
+      <div class="rg" id="food-rg">
+        <label class="rl" onclick="selR('food-rg',this)"><input type="radio" name="food" value="veg"> 🥦 Veg</label>
+        <label class="rl" onclick="selR('food-rg',this)"><input type="radio" name="food" value="nonveg"> 🍗 Non-Veg</label>
+      </div>
+    </div>
+    <div class="fg"><label>Delivery Address *</label><textarea class="fi" id="c-addr" rows="2" placeholder="Full address..."></textarea></div>
+    <div class="fg"><label>Monthly Amount (₹)</label><input class="fi" type="number" id="c-amt" placeholder="e.g. 2500"></div>
+    <div class="fg"><label>Start / Due Date</label><input class="fi" type="date" id="c-date"></div>
+    <div style="display:flex;gap:9px;margin-top:8px;">
+      <button class="btn bg" style="flex:1" onclick="closeModal()">Cancel</button>
+      <button class="btn bp" style="flex:1" id="save-btn" onclick="saveCust()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+//  SUPABASE DIRECT REST — No external SDK/CDN required
+// ============================================================
+let SB_URL = '', SB_KEY = '';
+
+async function sbReq(path, method, body, extra) {
+  method = method || 'GET';
+  extra = extra || {};
+  const headers = {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+  if (method === 'POST' || method === 'PATCH') headers['Prefer'] = 'return=representation';
+  Object.assign(headers, extra);
+  const opts = { method: method, headers: headers };
+  if (body !== null && body !== undefined) opts.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  const txt = await res.text();
+  let parsed = null;
+  try { parsed = txt ? JSON.parse(txt) : null; } catch(e) { parsed = txt; }
+  if (!res.ok) {
+    const msg = (parsed && parsed.message) || (parsed && parsed.error) || txt || ('HTTP ' + res.status);
+    throw new Error(msg);
+  }
+  return parsed;
+}
+
+const Q = {
+  get:    function(t, qs)  { return sbReq(t + (qs ? '?' + qs : '')); },
+  post:   function(t, d)   { return sbReq(t, 'POST', d); },
+  patch:  function(t, f, d){ return sbReq(t + '?' + f, 'PATCH', d); },
+  del:    function(t, f)   { return sbReq(t + '?' + f, 'DELETE'); },
+  upsert: function(t, d, c){ return sbReq(t + '?on_conflict=' + c, 'POST', d, {'Prefer':'resolution=merge-duplicates,return=representation'}); }
+};
+
+// ============================================================
+//  STATE
+// ============================================================
+var custs = [];
+var cart = {};
+var attMon = new Date();
+attMon = new Date(attMon.getFullYear(), attMon.getMonth(), 1);
+
+var MENU = [
+  {id:'m1', name:'Normal',       price:70,  emoji:'🍱'},
+  {id:'m2', name:'Special',      price:100, emoji:'⭐'},
+  {id:'m3', name:'Murga Chawal', price:110, emoji:'🍗'},
+  {id:'m4', name:'Machli Chawal',price:110, emoji:'🐟'},
+  {id:'m5', name:'Anda Chawal',  price:90,  emoji:'🥚'},
+];
+var ADDONS = [
+  {id:'a1', name:'Chawal (Full)', price:40, emoji:'🍚'},
+  {id:'a2', name:'Chawal (Half)', price:20, emoji:'🍚'},
+  {id:'a3', name:'Roti',          price:7,  emoji:'🫓'},
+  {id:'a4', name:'Water Bottle',  price:20, emoji:'💧'},
+];
+
+// ============================================================
+//  SETUP
+// ============================================================
+function showErr(msg, showSQL) {
+  var b = document.getElementById('errbox');
+  b.innerHTML = '❌ ' + msg;
+  b.style.display = 'block';
+  var w = document.getElementById('sql-warn');
+  var s = document.getElementById('sqlbox');
+  if (showSQL) { w.style.display = 'block'; s.style.display = 'block'; }
+  else { w.style.display = 'none'; s.style.display = 'none'; }
+}
+function hideErr() {
+  document.getElementById('errbox').style.display = 'none';
+  document.getElementById('sql-warn').style.display = 'none';
+  document.getElementById('sqlbox').style.display = 'none';
+}
+
+async function connectDB() {
+  var url = document.getElementById('sb-url').value.trim().replace(/\/+$/, '');
+  var key = document.getElementById('sb-key').value.trim();
+  hideErr();
+
+  if (!url || !key)                 { showErr('Please fill in both fields.'); return; }
+  if (!url.startsWith('https://'))  { showErr('URL must start with https://'); return; }
+  if (key.length < 20)              { showErr('API key looks too short. Use the anon/public key from Supabase → Settings → API.'); return; }
+
+  var btn = document.getElementById('con-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Connecting...';
+
+  SB_URL = url; SB_KEY = key;
+
+  try {
+    await Q.get('customers', 'select=id&limit=1');
+    localStorage.setItem('tb_url', url);
+    localStorage.setItem('tb_key', key);
+    launchApp();
+  } catch(e) {
+    SB_URL = ''; SB_KEY = '';
+    var m = e.message || '';
+    if (m.includes('does not exist') || m.includes('relation') || m.includes('42P01')) {
+      showErr('Connected! But tables are missing. Run the SQL shown below in Supabase → SQL Editor, then click Connect again.', true);
+    } else if (m.includes('Invalid API') || m.includes('JWT') || m.includes('apikey')) {
+      showErr('Invalid API key. Use the <b>anon public</b> key from Supabase → Settings → API.');
+    } else if (m.includes('Failed to fetch') || m.includes('NetworkError') || m.includes('fetch')) {
+      showErr('Cannot reach server. Check your Project URL and internet connection.');
+    } else {
+      showErr(m || 'Unknown error. Check your URL and key.');
+    }
+    btn.disabled = false;
+    btn.textContent = '🔌 Connect Database';
+  }
+}
+
+function loadSaved() {
+  var url = localStorage.getItem('tb_url');
+  var key = localStorage.getItem('tb_key');
+  if (url && key) {
+    document.getElementById('sb-url').value = url;
+    document.getElementById('sb-key').value = key;
+    connectDB();
+  } else {
+    showErr('No saved credentials found on this device. Enter them manually above.');
+  }
+}
+
+function launchApp() {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('mon-lbl').textContent =
+    attMon.toLocaleString('default', {month:'long', year:'numeric'});
+  setSt('ok');
+  renderDash();
+  fillAttSel();
+  renderBillForm();
+  loadTG();
+  autoRemind();
+}
+
+function disconn() {
+  if (!confirm('Disconnect database?')) return;
+  SB_URL = ''; SB_KEY = '';
+  document.getElementById('setup').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  hideErr();
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function setSt(s) { document.getElementById('dot').className = 'dot ' + s; }
+function today()  { return new Date().toISOString().slice(0,10); }
+function pad(n)   { return String(n).padStart(2,'0'); }
+
+function toast(msg, dur) {
+  dur = dur || 2600;
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('sh');
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.classList.remove('sh'); }, dur);
+}
+
+function openModal()  { document.getElementById('mo-cust').classList.add('op'); }
+function closeModal() { document.getElementById('mo-cust').classList.remove('op'); }
+
+function selR(gid, el) {
+  document.querySelectorAll('#' + gid + ' .rl').forEach(function(l){ l.classList.remove('sel'); });
+  el.classList.add('sel');
+  el.querySelector('input').checked = true;
+}
+
+function goTo(id) {
+  document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('ac'); });
+  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('ac'); });
+  document.getElementById('sec-' + id).classList.add('ac');
+  document.getElementById('nav-' + id).classList.add('ac');
+  if (id === 'dashboard') renderDash();
+  if (id === 'customers') renderCusts();
+  if (id === 'attendance') { fillAttSel(); renderAtt(); }
+  if (id === 'billing') renderBillForm();
+  if (id === 'dues') renderDues();
+  if (id === 'settings') { pingDB(); loadTG(); }
+}
+
+// ============================================================
+//  DASHBOARD
+// ============================================================
+async function renderDash() {
+  setSt('sy');
+  try {
+    var res = await Promise.all([
+      Q.get('customers', 'select=*'),
+      Q.get('bills', 'select=*&bill_date=eq.' + today())
+    ]);
+    custs = res[0] || [];
+    var bills = res[1] || [];
+    setSt('ok');
+    var rev = bills.reduce(function(s,b){ return s+b.total; }, 0);
+    var unp = custs.filter(function(c){ return c.due_status === 'unpaid'; }).length;
+    document.getElementById('stat-grid').innerHTML =
+      '<div class="sc"><div class="sv">'+custs.length+'</div><div class="sl">Customers</div></div>' +
+      '<div class="sc"><div class="sv" style="color:var(--g)">₹'+rev+'</div><div class="sl">Today Revenue</div></div>' +
+      '<div class="sc"><div class="sv" style="color:var(--r)">'+unp+'</div><div class="sl">Unpaid Dues</div></div>' +
+      '<div class="sc"><div class="sv">'+bills.length+'</div><div class="sl">Bills Today</div></div>';
+    document.getElementById('today-sum').innerHTML =
+      custs.filter(function(c){return c.food_type==='veg';}).length + ' Veg &nbsp;|&nbsp; ' +
+      custs.filter(function(c){return c.food_type==='nonveg';}).length + ' Non-Veg &nbsp;|&nbsp; Total: ' + custs.length;
+    var unpList = custs.filter(function(c){ return c.due_status === 'unpaid'; });
+    document.getElementById('dues-alert').innerHTML = unpList.length === 0
+      ? '<span style="color:var(--g);font-size:13px;">✅ All dues cleared!</span>'
+      : unpList.map(function(c){
+          return '<div style="font-size:13px;padding:5px 0;border-bottom:1px solid var(--br);"><b>'+c.name+'</b> — ₹'+c.amount+' <span class="db du">Unpaid</span></div>';
+        }).join('');
+  } catch(e) { setSt('er'); toast('❌ ' + e.message); }
+}
+
+// ============================================================
+//  CUSTOMERS
+// ============================================================
+async function renderCusts() {
+  setSt('sy');
+  var q = (document.getElementById('csearch') ? document.getElementById('csearch').value : '').toLowerCase();
+  try {
+    var data = await Q.get('customers', 'select=*&order=created_at.desc');
+    custs = data || [];
+    setSt('ok');
+    var list = custs.filter(function(c){
+      return c.name.toLowerCase().includes(q) || (c.mobile||'').includes(q);
+    });
+    var el = document.getElementById('cust-list');
+    if (!list.length) { el.innerHTML = '<div class="ld">No customers found</div>'; return; }
+    el.innerHTML = list.map(function(c){
+      return '<div class="cc">' +
+        '<div class="ch"><div>' +
+          '<div class="cn">'+c.name+'</div>' +
+          '<div style="display:flex;gap:5px;margin-top:3px;flex-wrap:wrap;">' +
+            '<span class="cb '+(c.food_type==='veg'?'bv':'bn')+'">'+(c.food_type==='veg'?'🥦 Veg':'🍗 Non-Veg')+'</span>' +
+            '<span class="cb '+(c.occupation==='student'?'bu':'be')+'">'+(c.occupation==='student'?'📚 Student':'💼 Employed')+'</span>' +
+          '</div></div>' +
+          '<span class="db '+(c.due_status==='paid'?'dp':'du')+'">'+(c.due_status==='paid'?'✅ Paid':'❌ Unpaid')+'</span>' +
+        '</div>' +
+        '<div class="ci"><span>📞 '+c.mobile+'</span><span>🏠 '+(c.address||'')+'</span><span>💰 ₹'+c.amount+'/mo &nbsp;|&nbsp; 📅 Due: '+(c.due_date||'N/A')+'</span></div>' +
+        '<div class="ca">' +
+          '<button class="btn bg sm" onclick="editCust(\''+c.id+'\')">✏️ Edit</button>' +
+          '<button class="btn '+(c.due_status==='paid'?'bg':'bs')+' sm" onclick="togglePaid(\''+c.id+'\',\''+c.due_status+'\',\''+c.start_date+'\',\''+c.due_date+'\')">'+(c.due_status==='paid'?'↩ Unpaid':'✅ Paid')+'</button>' +
+          '<button class="btn bg sm" onclick="notifyCust(\''+c.id+'\')">📱 Notify</button>' +
+          '<button class="btn bd sm" onclick="delCust(\''+c.id+'\')">🗑</button>' +
+        '</div></div>';
+    }).join('');
+  } catch(e) { setSt('er'); toast('❌ ' + e.message); }
+}
+
+function openAdd() {
+  document.getElementById('mo-title').textContent = '➕ Add Customer';
+  document.getElementById('edit-id').value = '';
+  ['c-name','c-mob','c-addr','c-amt'].forEach(function(i){ document.getElementById(i).value=''; });
+  document.getElementById('c-date').value = today();
+  document.querySelectorAll('#occ-rg .rl, #food-rg .rl').forEach(function(l){ l.classList.remove('sel'); });
+  openModal();
+}
+
+function editCust(id) {
+  var c = custs.find(function(x){ return x.id===id; });
+  if (!c) return;
+  document.getElementById('mo-title').textContent = '✏️ Edit Customer';
+  document.getElementById('edit-id').value = c.id;
+  document.getElementById('c-name').value = c.name||'';
+  document.getElementById('c-mob').value = c.mobile||'';
+  document.getElementById('c-addr').value = c.address||'';
+  document.getElementById('c-amt').value = c.amount||'';
+  document.getElementById('c-date').value = c.due_date||c.start_date||today();
+  document.querySelectorAll('#occ-rg .rl').forEach(function(l){
+    var v = l.querySelector('input').value;
+    l.classList.toggle('sel', v===c.occupation);
+    if (v===c.occupation) l.querySelector('input').checked=true;
+  });
+  document.querySelectorAll('#food-rg .rl').forEach(function(l){
+    var v = l.querySelector('input').value;
+    l.classList.toggle('sel', v===c.food_type);
+    if (v===c.food_type) l.querySelector('input').checked=true;
+  });
+  openModal();
+}
+
+async function saveCust() {
+  var name  = document.getElementById('c-name').value.trim();
+  var mob   = document.getElementById('c-mob').value.trim();
+  var addr  = document.getElementById('c-addr').value.trim();
+  var amt   = parseFloat(document.getElementById('c-amt').value)||0;
+  var occ   = (document.querySelector('input[name="occ"]:checked') || {}).value || 'employed';
+  var food  = (document.querySelector('input[name="food"]:checked') || {}).value || 'veg';
+  var dd    = document.getElementById('c-date').value;
+  if (!name||!mob) { toast('⚠️ Name and mobile required'); return; }
+  var btn = document.getElementById('save-btn');
+  btn.disabled=true; btn.textContent='Saving...';
+  setSt('sy');
+  try {
+    var eid = document.getElementById('edit-id').value;
+    if (eid) {
+      await Q.patch('customers','id=eq.'+eid,{name:name,mobile:mob,address:addr,amount:amt,occupation:occ,food_type:food,due_date:dd});
+      toast('✅ Customer updated!');
+    } else {
+      await Q.post('customers',{name:name,mobile:mob,address:addr,amount:amt,occupation:occ,food_type:food,start_date:dd,due_date:dd,due_status:'unpaid'});
+      toast('✅ Customer added!');
+    }
+    setSt('ok'); closeModal(); renderCusts();
+  } catch(e) { setSt('er'); toast('❌ '+e.message); }
+  btn.disabled=false; btn.textContent='💾 Save';
+}
+
+async function delCust(id) {
+  if (!confirm('Delete this customer? All attendance will also be removed.')) return;
+  setSt('sy');
+  try { await Q.del('customers','id=eq.'+id); setSt('ok'); toast('🗑️ Deleted'); renderCusts(); }
+  catch(e) { setSt('er'); toast('❌ '+e.message); }
+}
+
+async function togglePaid(id, status, sd, dd) {
+  setSt('sy');
+  var ns = status==='paid' ? 'unpaid' : 'paid';
+  var nd = dd;
+  if (ns==='paid') {
+    var d = new Date(dd||sd||today());
+    d.setMonth(d.getMonth()+1);
+    nd = d.toISOString().slice(0,10);
+  }
+  try {
+    await Q.patch('customers','id=eq.'+id,{due_status:ns,due_date:nd,paid_at:ns==='paid'?new Date().toISOString():null});
+    setSt('ok');
+    toast(ns==='paid'?'✅ Paid! Next due: '+nd:'↩ Marked unpaid');
+    renderCusts();
+  } catch(e) { setSt('er'); toast('❌ '+e.message); }
+}
+
+// ============================================================
+//  ATTENDANCE
+// ============================================================
+async function fillAttSel() {
+  try {
+    var data = await Q.get('customers','select=id,name&order=name.asc');
+    custs = data||[];
+    var sel = document.getElementById('att-sel');
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">-- Choose Customer --</option>';
+    (data||[]).forEach(function(c){
+      sel.innerHTML += '<option value="'+c.id+'" '+(c.id===cur?'selected':'')+'>'+c.name+'</option>';
+    });
+  } catch(e) {}
+}
+
+function chMon(d) {
+  attMon = new Date(attMon.getFullYear(), attMon.getMonth()+d, 1);
+  document.getElementById('mon-lbl').textContent =
+    attMon.toLocaleString('default',{month:'long',year:'numeric'});
+  renderAtt();
+}
+
+async function renderAtt() {
+  var cid = document.getElementById('att-sel').value;
+  var wrap = document.getElementById('att-wrap');
+  var sumEl = document.getElementById('att-sum');
+  if (!cid) { wrap.innerHTML=''; sumEl.innerHTML=''; return; }
+  wrap.innerHTML = '<div class="ld">Loading...</div>';
+  var yr=attMon.getFullYear(), mo=attMon.getMonth();
+  var days=new Date(yr,mo+1,0).getDate();
+  var ms=yr+'-'+pad(mo+1);
+  try {
+    var attData = await Q.get('attendance',
+      'select=*&customer_id=eq.'+cid+'&att_date=gte.'+ms+'-01&att_date=lte.'+ms+'-'+pad(days));
+    var map={};
+    (attData||[]).forEach(function(a){ map[a.att_date]=a; });
+    var rows='', absSess=0, presSess=0;
+    for (var d=1; d<=days; d++) {
+      var key=ms+'-'+pad(d);
+      var v=map[key]||{lunch:1,dinner:1};
+      if (v.lunch===0) absSess++; else presSess++;
+      if (v.dinner===0) absSess++; else presSess++;
+      var wd=new Date(yr,mo,d).toLocaleString('en',{weekday:'short'});
+      rows+='<tr><td style="font-weight:700">'+d+'</td><td>'+wd+'</td>' +
+        '<td><button class="ab '+(v.lunch===1?'ap':'aa')+'" onclick="togAtt(\''+cid+'\',\''+key+'\',\'lunch\','+(v.lunch===1?0:1)+')">'+(v.lunch===1?'✅':'❌')+'</button></td>' +
+        '<td><button class="ab '+(v.dinner===1?'ap':'aa')+'" onclick="togAtt(\''+cid+'\',\''+key+'\',\'dinner\','+(v.dinner===1?0:1)+')">'+(v.dinner===1?'✅':'❌')+'</button></td></tr>';
+    }
+    wrap.innerHTML='<div class="card" style="padding:9px 5px;"><table class="at">' +
+      '<thead><tr><th>Day</th><th>Week</th><th>🌤 Lunch</th><th>🌙 Dinner</th></tr></thead>' +
+      '<tbody>'+rows+'</tbody></table></div>';
+    var absDays=Math.floor(absSess/2);
+    var adjDue='N/A';
+    try {
+      var cd=await Q.get('customers','select=start_date,due_date&id=eq.'+cid);
+      if (cd&&cd[0]&&cd[0].start_date) {
+        var base=new Date(cd[0].start_date);
+        base.setMonth(base.getMonth()+1);
+        base.setDate(base.getDate()+absDays);
+        adjDue=base.toISOString().slice(0,10);
+        await Q.patch('customers','id=eq.'+cid,{due_date:adjDue});
+      }
+    } catch(_) {}
+    sumEl.innerHTML='<div class="card"><div class="ctit">📊 Summary</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">' +
+        '<div><div style="font-size:20px;font-weight:800;color:var(--g)">'+presSess+'</div><div style="font-size:10px;color:var(--mu)">Present</div></div>' +
+        '<div><div style="font-size:20px;font-weight:800;color:var(--r)">'+absSess+'</div><div style="font-size:10px;color:var(--mu)">Absent Sess.</div></div>' +
+        '<div><div style="font-size:20px;font-weight:800;color:var(--y)">'+absDays+'</div><div style="font-size:10px;color:var(--mu)">Absent Days</div></div>' +
+      '</div>' +
+      '<div style="margin-top:9px;font-size:12px;background:var(--ol);padding:9px;border-radius:9px;">' +
+        '📅 Adjusted Due Date: <b style="color:var(--o)">'+adjDue+'</b><br>' +
+        '<span style="color:var(--mu)">(Start + 1 month + '+absDays+' absent day'+(absDays!==1?'s':'')+')</span>' +
+      '</div></div>';
+  } catch(e) { wrap.innerHTML='<div class="ld">❌ '+e.message+'</div>'; }
+}
+
+async function togAtt(cid, date, meal, newVal) {
+  setSt('sy');
+  try {
+    var body={customer_id:cid, att_date:date};
+    body[meal]=newVal;
+    await Q.upsert('attendance', body, 'customer_id,att_date');
+    setSt('ok'); renderAtt();
+  } catch(e) { setSt('er'); toast('❌ '+e.message); }
+}
+
+// ============================================================
+//  BILLING
+// ============================================================
+function renderBillForm() {
+  var mi=document.getElementById('main-items');
+  var ai=document.getElementById('addon-items');
+  if (!mi) return;
+  mi.innerHTML=MENU.map(function(it){
+    return '<div class="mi"><div><div class="mn">'+it.emoji+' '+it.name+'</div><div class="mp">₹'+it.price+'</div></div>' +
+      '<div class="qc"><button class="qb" onclick="chQ(\''+it.id+'\',-1)">−</button>' +
+      '<span class="qv" id="q-'+it.id+'">'+(cart[it.id]||0)+'</span>' +
+      '<button class="qb" onclick="chQ(\''+it.id+'\',1)">+</button></div></div>';
+  }).join('');
+  ai.innerHTML=ADDONS.map(function(it){
+    return '<div class="mi"><div><div class="mn">'+it.emoji+' '+it.name+'</div><div class="mp">₹'+it.price+'/pc</div></div>' +
+      '<div class="qc"><button class="qb" onclick="chQ(\''+it.id+'\',-1)">−</button>' +
+      '<span class="qv" id="q-'+it.id+'">'+(cart[it.id]||0)+'</span>' +
+      '<button class="qb" onclick="chQ(\''+it.id+'\',1)">+</button></div></div>';
+  }).join('');
+  updTotal();
+}
+
+function chQ(id, d) {
+  cart[id]=Math.max(0,(cart[id]||0)+d);
+  var el=document.getElementById('q-'+id);
+  if (el) el.textContent=cart[id];
+  updTotal();
+}
+
+function updTotal() {
+  var tot=0, cnt=0;
+  MENU.concat(ADDONS).forEach(function(it){ var q=cart[it.id]||0; tot+=q*it.price; cnt+=q; });
+  var t=document.getElementById('b-tot'), c=document.getElementById('b-cnt');
+  if (t) t.textContent='₹'+tot;
+  if (c) c.textContent=cnt;
+}
+
+function clearBill() { cart={}; renderBillForm(); toast('🔄 Cleared'); }
+
+async function saveBill() {
+  var all=MENU.concat(ADDONS);
+  var items=all.filter(function(it){ return (cart[it.id]||0)>0; })
+    .map(function(it){ return {id:it.id,name:it.name,emoji:it.emoji,price:it.price,qty:cart[it.id],subtotal:it.price*cart[it.id]}; });
+  if (!items.length) { toast('⚠️ Add items first'); return; }
+  var total=items.reduce(function(s,it){ return s+it.subtotal; },0);
+  setSt('sy');
+  try {
+    await Q.post('bills',{bill_date:today(),bill_time:new Date().toLocaleTimeString(),items:items,total:total});
+    setSt('ok'); cart={}; renderBillForm(); toast('✅ Bill saved! ₹'+total);
+  } catch(e) { setSt('er'); toast('❌ '+e.message); }
+}
+
+function billTab(tab) {
+  document.getElementById('bnew').style.display=tab==='new'?'block':'none';
+  document.getElementById('bhist').style.display=tab==='hist'?'block':'none';
+  document.querySelectorAll('.tbt').forEach(function(b){ b.classList.remove('ac'); });
+  document.getElementById('bt-'+tab).classList.add('ac');
+  if (tab==='hist') renderHist();
+}
+
+async function renderHist() {
+  var el=document.getElementById('hist-list');
+  el.innerHTML='<div class="ld">Loading...</div>';
+  try {
+    var data=await Q.get('bills','select=*&order=created_at.desc&limit=100');
+    if (!data||!data.length) { el.innerHTML='<div class="ld">No bills yet</div>'; return; }
+    var byDate={};
+    data.forEach(function(b){ if (!byDate[b.bill_date]) byDate[b.bill_date]=[]; byDate[b.bill_date].push(b); });
+    el.innerHTML=Object.entries(byDate).map(function(e){
+      var date=e[0], bs=e[1];
+      var dtot=bs.reduce(function(s,b){ return s+b.total; },0);
+      return '<div class="card"><div class="ctit" style="font-size:13px;">📅 '+date+' — ₹'+dtot+'</div>'+
+        bs.map(function(b){
+          return '<div class="bhi"><div>' +
+            '<div style="font-size:12px;font-weight:700">'+b.bill_time+'</div>' +
+            '<div style="font-size:10px;color:var(--mu)">'+b.items.map(function(i){ return i.emoji+' '+i.name+' x'+i.qty; }).join(', ')+'</div>' +
+            '</div><b style="color:var(--o)">₹'+b.total+'</b></div>';
+        }).join('')+'</div>';
+    }).join('');
+  } catch(e) { el.innerHTML='<div class="ld">❌ '+e.message+'</div>'; }
+}
+
+// ============================================================
+//  DUES
+// ============================================================
+async function renderDues() {
+  var el=document.getElementById('dues-list');
+  el.innerHTML='<div class="ld">Loading...</div>';
+  try {
+    var data=await Q.get('customers','select=*&order=name.asc');
+    custs=data||[];
+    if (!data||!data.length) { el.innerHTML='<div class="ld">No customers</div>'; return; }
+    var now=new Date();
+    el.innerHTML=data.map(function(c){
+      var dd=new Date(c.due_date||c.start_date);
+      var over=Math.floor((now-dd)/86400000);
+      var isOver=over>0&&c.due_status==='unpaid';
+      return '<div class="card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">' +
+          '<div><div style="font-family:\'Baloo 2\',cursive;font-size:15px;font-weight:700">'+c.name+'</div>' +
+          '<div style="font-size:11px;color:var(--mu)">📞 '+c.mobile+'</div></div>' +
+          '<span class="db '+(c.due_status==='paid'?'dp':'du')+'">'+(c.due_status==='paid'?'✅ Paid':'❌ Unpaid')+'</span>' +
+        '</div>' +
+        '<div style="font-size:12px;margin-bottom:7px;">💰 <b>₹'+c.amount+'</b> &nbsp;|&nbsp; 📅 Due: <b>'+(c.due_date||'N/A')+'</b>' +
+          (isOver?'<span style="color:var(--r);font-size:11px;"> ('+over+'d overdue)</span>':'')+'</div>' +
+        '<div style="display:flex;gap:7px;flex-wrap:wrap;">' +
+          '<button class="btn '+(c.due_status==='paid'?'bg':'bs')+' sm" onclick="togglePaid(\''+c.id+'\',\''+c.due_status+'\',\''+c.start_date+'\',\''+c.due_date+'\');setTimeout(renderDues,900)">' +
+            (c.due_status==='paid'?'↩ Unpaid':'✅ Mark Paid')+'</button>' +
+          '<button class="btn bg sm" onclick="notifyCust(\''+c.id+'\')">📱 Notify</button>' +
+        '</div></div>';
+    }).join('');
+  } catch(e) { el.innerHTML='<div class="ld">❌ '+e.message+'</div>'; }
+}
+
+// ============================================================
+//  TELEGRAM
+// ============================================================
+async function loadTG() {
+  try {
+    var data=await Q.get('settings','select=key,value&key=in.(tg_token,tg_chat)');
+    (data||[]).forEach(function(r){
+      if (r.key==='tg_token') document.getElementById('tg-tok').value=r.value||'';
+      if (r.key==='tg_chat')  document.getElementById('tg-cid').value=r.value||'';
+    });
+  } catch(_) {}
+}
+
+async function saveTG() {
+  var tok=document.getElementById('tg-tok').value.trim();
+  var cid=document.getElementById('tg-cid').value.trim();
+  try {
+    await Q.upsert('settings',[{key:'tg_token',value:tok},{key:'tg_chat',value:cid}],'key');
+    toast('✅ Telegram settings saved!');
+  } catch(e) { toast('❌ '+e.message); }
+}
+
+async function getTGCreds() {
+  try {
+    var data=await Q.get('settings','select=key,value&key=in.(tg_token,tg_chat)');
+    var obj={};
+    (data||[]).forEach(function(r){ obj[r.key]=r.value; });
+    return {token:obj.tg_token, chat:obj.tg_chat};
+  } catch(_) { return {token:'',chat:''}; }
+}
+
+async function sendTGMsg(msg) {
+  var creds=await getTGCreds();
+  if (!creds.token||!creds.chat) { toast('⚠️ Set Telegram credentials in Settings'); return false; }
+  try {
+    var r=await fetch('https://api.telegram.org/bot'+creds.token+'/sendMessage',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:creds.chat,text:msg,parse_mode:'HTML'})
+    });
+    var d=await r.json();
+    return d.ok;
+  } catch(e) { toast('❌ Telegram: '+e.message); return false; }
+}
+
+async function notifyCust(id) {
+  var c=custs.find(function(x){ return x.id===id; });
+  if (!c) {
+    try { var d=await Q.get('customers','select=*&id=eq.'+id); c=d&&d[0]; } catch(_) {}
+  }
+  if (!c) { toast('Customer not found'); return; }
+  var msg='🍱 <b>Tasty Bite</b> — Payment Reminder\n\nDear <b>'+c.name+'</b>,\n\n' +
+    'Your monthly tiffin due of <b>₹'+c.amount+'</b> is pending.\n' +
+    '📅 Due Date: <b>'+(c.due_date||'N/A')+'</b>\n\nKindly pay at the earliest.\n\nThank you! 🙏\n— <i>Tasty Bite Team</i>';
+  var ok=await sendTGMsg(msg);
+  if (ok) {
+    try { await Q.patch('customers','id=eq.'+id,{last_reminder:new Date().toISOString()}); } catch(_) {}
+    toast('✅ Reminder sent!');
+  } else { toast('❌ Failed — check Telegram settings'); }
+}
+
+async function sendAll() {
+  try {
+    var data=await Q.get('customers','select=*&due_status=eq.unpaid');
+    if (!data||!data.length) { toast('✅ No unpaid dues!'); return; }
+    var sent=0;
+    for (var i=0;i<data.length;i++) {
+      var c=data[i];
+      var now=new Date(), dd=new Date(c.due_date||c.start_date);
+      var days=Math.floor((now-dd)/86400000);
+      var extra=days>7?'\n⚠️ <b>OVERDUE by '+days+' days!</b>':'';
+      var msg='🍱 <b>Tasty Bite</b> — Monthly Reminder\n\n<b>'+c.name+'</b>\n💰 Amount: ₹'+c.amount+'\n📅 Due: '+(c.due_date||'N/A')+extra+'\n\nThank you! 🙏';
+      var ok=await sendTGMsg(msg);
+      if (ok) { sent++; try { await Q.patch('customers','id=eq.'+c.id,{last_reminder:new Date().toISOString()}); } catch(_) {} }
+    }
+    toast('📤 Sent '+sent+'/'+data.length+' reminders');
+  } catch(e) { toast('❌ '+e.message); }
+}
+
+async function autoRemind() {
+  try {
+    var data=await Q.get('customers','select=*&due_status=eq.unpaid');
+    if (!data) return;
+    custs=data;
+    var now=new Date();
+    for (var i=0;i<data.length;i++) {
+      var c=data[i];
+      var dd=new Date(c.due_date||c.start_date);
+      var days=Math.floor((now-dd)/86400000);
+      if (days>=7) {
+        var lr=c.last_reminder?new Date(c.last_reminder):null;
+        var since=lr?Math.floor((now-lr)/86400000):999;
+        if (since>=7) await notifyCust(c.id);
+      }
+    }
+  } catch(_) {}
+}
+
+// ============================================================
+//  SETTINGS PING
+// ============================================================
+async function pingDB() {
+  setSt('sy');
+  var el=document.getElementById('db-st');
+  try {
+    await Q.get('customers','select=id&limit=1');
+    setSt('ok');
+    el.className='dbst dbok';
+    el.textContent='✅ Connected to Supabase PostgreSQL';
+  } catch(e) {
+    setSt('er');
+    el.className='dbst dber';
+    el.textContent='❌ '+e.message;
+  }
+}
+
+// ============================================================
+//  MODAL CLOSE ON OVERLAY CLICK
+// ============================================================
+document.getElementById('mo-cust').addEventListener('click', function(e){
+  if (e.target===this) closeModal();
+});
+
+// Auto-load saved credentials on page load
+window.addEventListener('load', loadSaved);
+</script>
+</body>
+</html>
