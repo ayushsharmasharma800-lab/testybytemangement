@@ -11,7 +11,7 @@
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;max-width:430px;margin:0 auto;}
 
 /* SETUP */
-#setup{position:fixed;inset:0;background:var(--o);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 20px 40px;overflow-y:auto;}
+#setup{position:fixed;inset:0;background:var(--o);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 20px 40px;overflow-y:auto;}
 .slogo{font-size:48px;margin:18px 0 6px;}
 #setup h1{font-family:'Baloo 2',cursive;font-size:30px;color:#fff;font-weight:800;}
 #setup .tag{color:rgba(255,255,255,.85);font-size:12px;margin-bottom:20px;}
@@ -357,7 +357,7 @@ CREATE POLICY "open_s" ON settings   FOR ALL USING (true) WITH CHECK (true);</te
 // ============================================================
 //  SUPABASE DIRECT REST — No external SDK/CDN required
 // ============================================================
-let SB_URL = '', SB_KEY = '';
+var SB_URL = '', SB_KEY = ''; // overridden below in STATE block
 
 async function sbReq(path, method, body, extra) {
   method = method || 'GET';
@@ -390,6 +390,14 @@ const Q = {
   del:    function(t, f)   { return sbReq(t + '?' + f, 'DELETE'); },
   upsert: function(t, d, c){ return sbReq(t + '?on_conflict=' + c, 'POST', d, {'Prefer':'resolution=merge-duplicates,return=representation'}); }
 };
+
+// ============================================================
+//  HARDCODED CREDENTIALS — no login needed on any device
+// ============================================================
+SB_URL = 'https://kwlavsszqzhyqlkldyxq.supabase.co';
+SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3bGF2c3N6cXpoeXFsa2xkeXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Nzg0MjAsImV4cCI6MjA5NDE1NDQyMH0.9U41Y-MRoT8uOY1woNT5GuiwFNTc8M8n-LdSBOyW6PY';
+var TG_TOKEN = '8412617685:AAEqhPDfG4W9_ee7aDxbf6thhvtui_DvIt0';
+var TG_CHAT  = '-1003939832679';
 
 // ============================================================
 //  STATE
@@ -469,15 +477,8 @@ async function connectDB() {
 }
 
 function loadSaved() {
-  var url = localStorage.getItem('tb_url');
-  var key = localStorage.getItem('tb_key');
-  if (url && key) {
-    document.getElementById('sb-url').value = url;
-    document.getElementById('sb-key').value = key;
-    connectDB();
-  } else {
-    showErr('No saved credentials found on this device. Enter them manually above.');
-  }
+  // Credentials are hardcoded — launch directly on every device
+  launchApp();
 }
 
 function launchApp() {
@@ -892,13 +893,9 @@ async function renderDues() {
 //  TELEGRAM
 // ============================================================
 async function loadTG() {
-  try {
-    var data=await Q.get('settings','select=key,value&key=in.(tg_token,tg_chat)');
-    (data||[]).forEach(function(r){
-      if (r.key==='tg_token') document.getElementById('tg-tok').value=r.value||'';
-      if (r.key==='tg_chat')  document.getElementById('tg-cid').value=r.value||'';
-    });
-  } catch(_) {}
+  // Prefill settings UI with hardcoded credentials
+  document.getElementById('tg-tok').value = TG_TOKEN;
+  document.getElementById('tg-cid').value = TG_CHAT;
 }
 
 async function saveTG() {
@@ -911,12 +908,8 @@ async function saveTG() {
 }
 
 async function getTGCreds() {
-  try {
-    var data=await Q.get('settings','select=key,value&key=in.(tg_token,tg_chat)');
-    var obj={};
-    (data||[]).forEach(function(r){ obj[r.key]=r.value; });
-    return {token:obj.tg_token, chat:obj.tg_chat};
-  } catch(_) { return {token:'',chat:''}; }
+  // Use hardcoded Telegram credentials
+  return { token: TG_TOKEN, chat: TG_CHAT };
 }
 
 async function sendTGMsg(msg) {
